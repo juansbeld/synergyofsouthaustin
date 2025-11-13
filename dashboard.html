@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruitment Dashboard - TX20 South Austin</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>Recruitment Dashboard</h1>
+            <p class="subtitle">TX20 South Austin - Synergy HomeCare</p>
+            <div class="date-range" id="dateRange">Loading...</div>
+        </header>
+
+        <!-- Critical Alerts -->
+        <section class="alerts-section" id="alertsSection">
+            <!-- Alerts will be dynamically inserted -->
+        </section>
+
+        <!-- Key Metrics Cards -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">📊</div>
+                <div class="metric-value" id="totalApplications">-</div>
+                <div class="metric-label">Total Applications</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">👁️</div>
+                <div class="metric-value" id="viewedRate">-</div>
+                <div class="metric-label">Viewed Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">💼</div>
+                <div class="metric-value" id="interviewRate">-</div>
+                <div class="metric-label">Interview Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">📝</div>
+                <div class="metric-value" id="offerRate">-</div>
+                <div class="metric-label">Offer Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">✅</div>
+                <div class="metric-value" id="hireRate">-</div>
+                <div class="metric-label">Hire Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">⏱️</div>
+                <div class="metric-value" id="avgTimeToOffer">-</div>
+                <div class="metric-label">Avg. Time to Offer</div>
+            </div>
+        </section>
+
+        <!-- Charts Row 1 -->
+        <section class="charts-row">
+            <div class="chart-container">
+                <h2>Weekly Application Volume</h2>
+                <canvas id="weeklyTrendChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Conversion Funnel</h2>
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Charts Row 2 -->
+        <section class="charts-row">
+            <div class="chart-container">
+                <h2>Application Status Distribution</h2>
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Applications by Job Type</h2>
+                <canvas id="jobTypeChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Pipeline Stage Breakdown -->
+        <section class="pipeline-section">
+            <h2>Pipeline Stage Breakdown</h2>
+            <div class="pipeline-grid" id="pipelineGrid">
+                <!-- Pipeline stages will be dynamically inserted -->
+            </div>
+        </section>
+
+        <!-- Job Performance Table -->
+        <section class="table-section">
+            <h2>Job Posting Performance</h2>
+            <div class="table-container">
+                <table id="jobPerformanceTable">
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Job Owner</th>
+                            <th>Total Applicants</th>
+                            <th>Days Open</th>
+                            <th>Apps/Day</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be dynamically inserted -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Recruiter Performance Table -->
+        <section class="table-section">
+            <h2>Recruiter Performance</h2>
+            <div class="table-container">
+                <table id="recruiterPerformanceTable">
+                    <thead>
+                        <tr>
+                            <th>Recruiter</th>
+                            <th>Applications</th>
+                            <th>Viewed</th>
+                            <th>Interviews</th>
+                            <th>Offers</th>
+                            <th>View Rate</th>
+                            <th>Interview Rate</th>
+                            <th>Offer Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be dynamically inserted -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>Last Updated: <span id="lastUpdated">-</span></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
