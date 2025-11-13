@@ -1,154 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Synergy HomeCare South Austin Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        :root {
-            --primary: #911F36;
-            --accent: #CB5D78;
-            --bg: #F5F5F5;
-            --card-bg: rgba(255, 255, 255, 0.88);
-            --shadow: 0 4px 16px rgba(145,31,54,0.15);
-        }
-        body { font-family: 'Montserrat', 'Roboto', sans-serif; background: var(--bg); margin: 0;}
-        header { display: flex; align-items: center; padding: 1rem 2rem; background: var(--primary); color: #fff;}
-        .logo { height: 40px; margin-right: 1rem;}
-        h1 { flex: 1; font-size: 2em; }
-        .team-name { font-weight: 600; letter-spacing: .05em; }
-        aside { background: var(--primary); color: #fff; width: 200px; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 10;}
-        nav ul { list-style: none; padding: 2rem 0 0 2rem;}
-        nav li { margin-bottom: 1.2rem; font-weight: bold; cursor: pointer;}
-        main { margin-left: 220px; padding: 2rem 2rem 2rem 2rem;}
-        .cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem;}
-        .card { background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow); text-align: center; padding: 2rem 1rem;}
-        .card h2 { color: var(--primary); margin: 0;}
-        .card span { color: var(--accent);}
-        .table-section { margin: 2.5rem 0; }
-        table { border-collapse: collapse; width: 100%; background: var(--card-bg); box-shadow: var(--shadow); border-radius: 10px; overflow: hidden;}
-        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee;}
-        tr:last-child td { border-bottom: none;}
-        th { background: var(--accent); color: #fff;}
-        footer { background: var(--primary); color: #fff; text-align: center; padding: 1rem; margin-top: 3rem;}
-        @media (max-width: 1000px) {.cards {grid-template-columns:repeat(2,1fr);} main{padding:1rem;}}
-        @media (max-width: 700px) {
-            aside {position: static;width:100%;min-height:0;}
-            main {margin:0;}
-            .cards {grid-template-columns:1fr;}
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Synergy HomeCare South Austin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #911F36;
+      --accent: #CB5D78;
+      --bg: #F5F5F5;
+      --bg-dark: #201924;
+      --card-bg: rgba(255,255,255,0.92);
+      --card-bg-dark: #302236;
+      --shadow: 0 8px 24px rgba(145,31,54,0.13);
+      --speed: 0.16s;
+    }
+    body { font-family: 'Montserrat', 'Roboto', sans-serif; background: var(--bg); margin: 0; transition: background .4s;}
+    body.dark {background: var(--bg-dark);}
+    header { display: flex; align-items: center; padding: 1rem 2rem; background: var(--primary); color: #fff;}
+    .logo { height: 40px; margin-right: 1rem;}
+    h1 { flex: 1; font-size: 1.5em; }
+    .theme-toggle {cursor:pointer;background:none;border:none;color:#fff;font-size:1.3em;margin-left:1.5em;}
+    .team-name { font-weight: 600; letter-spacing: .05em; }
+    aside { background: var(--primary); color: #fff; width: 210px; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 10; transition: width .3s;}
+    nav ul { list-style: none; padding: 2rem 0 0 2rem;}
+    nav li { margin-bottom: 1.2rem; font-weight: bold; cursor: pointer;}
+    nav li.active {color: var(--accent);}
+    .sidebar-collapsed {width: 60px;}
+    .sidebar-collapsed nav ul li {font-size: 0; height: 32px;}
+    .sidebar-toggle {background:none;border:none;color:#fff;position:absolute;top:1.3em;right:-40px;font-size:1.4em;}
+    main { margin-left: 220px; padding: 2rem 2rem 2rem 2rem; transition: margin-left .3s;}
+    .sidebar-collapsed ~ main {margin-left: 60px;}
+    .cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem;}
+    .card { background: var(--card-bg); border-radius: 16px; box-shadow: var(--shadow); text-align: center; padding: 2.2rem 1rem 1.2rem 1rem; position: relative; overflow:hidden; transition:transform var(--speed);}
+    .card:hover {transform:translateY(-7px) scale(1.03);}
+    body.dark .card {background: var(--card-bg-dark);}
+    .card h2 { color: var(--primary); margin: 0; font-size: 2.5em; font-weight:700;}
+    .card span { color: var(--accent);}
+    .stat-up {color: green;}
+    .stat-down {color: red;}
+    .table-section { margin: 2.5rem 0; }
+    table { border-collapse: collapse; width: 100%; background: var(--card-bg); box-shadow: var(--shadow); border-radius: 10px; overflow: hidden;}
+    th, td { padding: 12px 7px; text-align: left; border-bottom: 1px solid #eee;}
+    tr:last-child td { border-bottom: none;}
+    th { background: var(--accent); color: #fff;}
+    .search-bar {margin:20px 0;display:flex;gap:1em;}
+    input[type=search] {padding:0.5em;border-radius:5px;border: 1px solid #ccc;}
+    .top-performer {margin:1em 0 .25em 0;padding:.7em 1.2em;font-weight:600;background:rgba(203,93,120,0.08);border-left:3px solid var(--primary);}
+    footer { background: var(--primary); color: #fff; text-align: center; padding: 1rem; margin-top: 3rem;}
+    @media (max-width: 1150px) {.cards {grid-template-columns:repeat(2,1fr);} main{padding:1rem;}}
+    @media (max-width: 750px) {
+        aside {position: static;width:100%!important;min-height:0;}
+        main {margin:0;}
+        .cards {grid-template-columns:1fr;}
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Synergy_HomeCare_logo.svg" alt="Synergy HomeCare Logo" class="logo">
-        <h1>Scheduling Team Dashboard</h1>
-        <span class="team-name">South Austin</span>
-    </header>
-    <aside>
-        <nav>
-            <ul>
-                <li>Dashboard</li>
-                <li>Schedules</li>
-                <li>Caregivers</li>
-                <li>Reports</li>
-                <li>Settings</li>
-            </ul>
-        </nav>
-    </aside>
-    <main>
-        <section class="cards" id="summaryCards">
-            <!-- Cards will be injected here -->
-        </section>
-        <section class="table-section">
-            <h2>Visits by Caregiver</h2>
-            <table id="caregiver-table"></table>
-        </section>
-        <section class="table-section">
-            <h2>Hours by Service Rate</h2>
-            <table id="service-rate-table"></table>
-        </section>
-    </main>
-    <footer>
-        <p>Synergy HomeCare South Austin &copy; 2025</p>
-        <p>Contact: 512-XXX-XXXX</p>
-    </footer>
-    <script>
-        // Demo data, replace this with imported JSON from your real reports
-        const summary = [
-            { label: "Total Visits", value: "515" },
-            { label: "Total Clients", value: "37" },
-            { label: "Total Caregivers", value: "21" },
-            { label: "Billable Hours", value: "1,553.10h" }
-        ];
-        const caregiverData = [
-            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Vivian Brown", visits: 2, billable: 3.25, payable: 2.6 },
-            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Cynthia Bryson", visits: 2, billable: 2.0, payable: 0.53 },
-            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Seanna Desmond", visits: 7, billable: 19.33, payable: 19.6 },
-            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Minerva Wesar", visits: 15, billable: 138.58, payable: 138.58 },
-        ];
-        const serviceRateData = [
-            { service: "Hourly 42.00 Personal Care", scheduledVisits: 306, scheduledHours: 1175.58, verifiedVisits: 306, verifiedHours: 1175.58 },
-            { service: "Fixed 21.00 sv15", scheduledVisits: 169, scheduledHours: 169, verifiedVisits: 169, verifiedHours: 169 },
-            { service: "Hourly 40.00 Transportation", scheduledVisits: 7, scheduledHours: 18.9, verifiedVisits: 7, verifiedHours: 18.9 },
-        ];
-
-        // Render Summary Cards
-        const cardSection = document.getElementById('summaryCards');
-        summary.forEach(card => {
-            cardSection.innerHTML += `
-                <div class="card">
-                    <h2>${card.value}</h2>
-                    <span>${card.label}</span>
-                </div>
-            `;
-        });
-
-        // Render Caregiver Table
-        function renderTable(data, tableId) {
-            const table = document.getElementById(tableId);
-            table.innerHTML = `<tr>
-                    <th>Caregiver</th>
-                    <th>Phone</th>
-                    <th>Client</th>
-                    <th>Visits</th>
-                    <th>Billable Hours</th>
-                    <th>Payable Hours</th>
-                </tr>` +
-                data.map(d =>
-                    `<tr>
-                        <td>${d.name}</td>
-                        <td>${d.phone}</td>
-                        <td>${d.client}</td>
-                        <td>${d.visits}</td>
-                        <td>${d.billable}</td>
-                        <td>${d.payable}</td>
-                    </tr>`
-                ).join('');
-        }
-        renderTable(caregiverData, 'caregiver-table');
-
-        // Render Service Rate Table
-        function renderServiceRate(data, tableId) {
-            const table = document.getElementById(tableId);
-            table.innerHTML = `<tr>
-                    <th>Service</th>
-                    <th>Scheduled Visits</th>
-                    <th>Scheduled Billable Hours</th>
-                    <th>Verified Visits</th>
-                    <th>Verified Billable Hours</th>
-                </tr>` +
-                data.map(d =>
-                    `<tr>
-                        <td>${d.service}</td>
-                        <td>${d.scheduledVisits}</td>
-                        <td>${d.scheduledHours}</td>
-                        <td>${d.verifiedVisits}</td>
-                        <td>${d.verifiedHours}</td>
-                    </tr>`
-                ).join('');
-        }
-        renderServiceRate(serviceRateData, 'service-rate-table');
-    </script>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Synergy_HomeCare_logo.svg" alt="Synergy HomeCare Logo" class="logo">
+    <h1>Scheduling Team Dashboard</h1>
+    <span class="team-name">South Austin</span>
+    <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark">&#9788;</button>
+  </header>
+  <aside id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <nav>
+      <ul>
+        <li class="active">Dashboard</li>
+        <li>Schedules</li>
+        <li>Caregivers</li>
+        <li>Reports</li>
+        <li>Settings</li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <section class="cards" id="summaryCards"></section>
+    <div class="top-performer" id="topPerformer"></div>
+    <section class="table-section">
+      <div class="search-bar">
+        <input type="search" placeholder="Search caregiver or client..." id="filterInput">
+      </div>
+      <h2>Visits by Caregiver</h2>
+      <table id="caregiver-table"></table>
+    </section>
+  </main>
+  <footer>
+    <p>Synergy HomeCare South Austin &copy; 2025</p>
+    <p>Contact: 512-XXX-XXXX</p>
+  </footer>
+  <script>
+    // REAL summary metrics
+    const summary = [
+      { label: "Total Visits", value: 515 },
+      { label: "Total Clients", value: 37 },
+      { label: "Total Caregivers", value: 21 },
+      { label: "Billable Hours", value: "1,553.10" },
+      { label: "Payable Hours", value: "1,478.65" },
+      { label: "Scheduled Hours", value: "1,469.38" },
+    ];
+    // REAL client-caregiver visit data, shortened here, but load all you need from your file!
+    const caregiverData = [
+      // Sample (add all rows from the CSV for full list)
+      { name: "Alvarez, Maria T", phone: "512-688-9435", client: "Brown , Vivian", visits: 2, billable: 3.25, payable: 2.6 },
+      { name: "Alvarez, Maria T", phone: "512-688-9435", client: "Bryson, Cynthia", visits: 2, billable: 2, payable: 0.53 },
+      { name: "Alvarez, Maria T", phone: "512-688-9435", client: "Desmond, Seanna", visits: 7, billable: 19.33, payable: 19.6 },
+      { name: "Alvarez, Maria T", phone: "512-688-9435", client: "Wesar, Minerva", visits: 15, billable: 138.58, payable: 138.58 },
+      { name: "Alvarez, Semaria", phone: "480-593-3223", client: "Bryson, Cynthia", visits: 1, billable: 1, payable: 0.23 },
+      // >>> TRUNCATED FOR DEMO: You should AUTOGENERATE this array with all rows from your CSV for production
+      // For full dashboard, parse CSV and paste all objects here
+    ];
+    // Summary cards
+    const cardSection = document.getElementById('summaryCards');
+    summary.forEach(card => {
+      cardSection.innerHTML += `
+        <div class="card">
+          <h2>${card.value}</h2>
+          <span>${card.label}</span>
+        </div>`;
+    });
+    // Calculate Top Performer by visit count
+    const byVisits = caregiverData.slice().sort((a,b)=>b.visits-a.visits)[0];
+    document.getElementById('topPerformer').innerHTML =
+      byVisits
+        ? `Most Active Caregiver: <b>${byVisits.name}</b> – <span style="color:var(--accent);">${byVisits.visits} visits</span>`
+        : '';
+    // Render Caregiver Table
+    function renderTable(data, tableId) {
+      const table = document.getElementById(tableId);
+      table.innerHTML = `<tr>
+          <th>Caregiver</th>
+          <th>Phone</th>
+          <th>Client</th>
+          <th>Visits</th>
+          <th>Billable Hours</th>
+          <th>Payable Hours</th>
+        </tr>` +
+        data.map(d =>
+          `<tr>
+            <td>${d.name}</td>
+            <td>${d.phone}</td>
+            <td>${d.client}</td>
+            <td>${d.visits}</td>
+            <td>${d.billable}</td>
+            <td>${d.payable}</td>
+          </tr>`
+        ).join('');
+    }
+    renderTable(caregiverData, 'caregiver-table');
+    // Table search/filter
+    document.getElementById('filterInput').addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      renderTable(
+        caregiverData.filter(
+          d => d.name.toLowerCase().includes(q) ||
+               d.client.toLowerCase().includes(q)
+        ),
+        'caregiver-table'
+      );
+    });
+    // Collapsible sidebar
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
+    }
+    // Theme toggle
+    document.getElementById('themeToggle').onclick = () => {
+      document.body.classList.toggle('dark');
+    };
+  </script>
 </body>
 </html>
