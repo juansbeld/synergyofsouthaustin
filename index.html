@@ -2,256 +2,114 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Scheduler Dashboard | Synergy HomeCare</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KPI Dashboard – Synergy South Austin (Scheduler)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
-      --background: #f9fafd;
-      --card: #fffdfcfa;
-      --kpi-shadow: 0 8px 28px rgba(34, 120, 220, 0.10);
-      --blue: #22c1c3;
-      --blue-dark: #1176d6;
-      --emerald: #11d880;
-      --warning: #ffe082;
-      --danger: #f44336;
-      --violet: #c56cf0;
-      --gray: #d6dee6;
-      --goal: #bbc3df;
-      --success: #1AC98E;
-      --card-radius: 18px;
-      --trfast: .16s cubic-bezier(.4,0,.2,1);
+      --primary: #f5f6fa;
+      --card-bg: #fff;
+      --accent: #0066ff;
+      --text-main: #222;
+      --text-sub: #666;
+      --shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+      --radius: 1.1em;
     }
     body {
-      margin:0; 
-      background:var(--background);
-      font-family:'Inter','Montserrat','Segoe UI',sans-serif; 
-      color:#224066;
+      margin: 0;
+      font-family: 'San Francisco', 'Segoe UI', 'Roboto', Arial, sans-serif;
+      background: var(--primary);
+      color: var(--text-main);
+      min-height: 100vh;
     }
-    header {
-      background: var(--blue-dark);
-      color: #fff;
-      padding: 1.2em 2.9em 1.2em 1em;
-      display: flex; align-items:center;
-      box-shadow: 0 2px 12px rgba(34,120,220,0.11);
+    .dashboard-container {
+      max-width: 670px;
+      margin: 40px auto;
+      padding: 2em 1em;
+      border-radius: var(--radius);
+      background: var(--primary);
+      box-shadow: var(--shadow);
+      text-align: center;
     }
-    .logo {height:40px;margin-right:1.05em;}
-    .main-section { max-width: 1250px; margin: 36px auto 0 auto; padding: 0 17px;}
-    .kpis {display:grid;grid-template-columns:repeat(4,1fr);gap:2em;margin-bottom:2.7em;}
-    .kpi {
-      background:var(--card);box-shadow:var(--kpi-shadow);border-radius:var(--card-radius);
-      padding:2em 1.2em 1.4em 1.2em;display:flex;flex-direction:column;align-items:center;
-      position:relative;overflow:hidden;transition:box-shadow var(--trfast);
-      min-width:0;
+    .dashboard-title {
+      margin-bottom: 1.2em;
+      font-size: 1.8em;
+      letter-spacing: -0.5px;
+      font-weight: 900;
+      color: var(--accent);
     }
-    .kpi .kpi-icon {font-size:2.2em;margin-bottom:.32em;}
-    .kpi-title {font-size:1.12em;line-height:1.6em;letter-spacing:.01em;}
+    .kpi-row {
+      display: flex;
+      gap: 1.1em;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .kpi-tile {
+      flex: 1 0 180px;
+      max-width: 220px;
+      padding: 2.1em 1em 1.6em 1em;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 1em;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.21s;
+    }
+    .kpi-tile:hover {
+      box-shadow: 0 6px 18px 0 rgba(0,102,255,0.11);
+    }
     .kpi-value {
-      font-size:2.35em;
-      font-weight:700;
-      letter-spacing:.05em;
-      margin:0 0 2px 0;
-      display:flex;align-items:flex-end;gap:6px;
+      font-size: 2.3em;
+      font-weight: 800;
+      margin-bottom: 0.1em;
+      color: var(--accent);
+      letter-spacing: -0.05em;
     }
-    .kpi-goal {
-      margin-left:2px;
-      font-size:.60em;
-      color:var(--gray); 
-      letter-spacing:.07em;
-      font-weight:600;
-      align-items:flex-end;
+    .kpi-label {
+      font-size: 1.05em;
+      color: var(--text-sub);
+      font-weight: 500;
+      letter-spacing: 0.01em;
     }
-    .bar-wrap{
-      width:96%;height:9px;margin:10px auto 0 auto;background:var(--goal);border-radius:7px;overflow:hidden;
+    @media (max-width: 600px) {
+      .kpi-row {
+        flex-direction: column;
+        gap: 0.2em;
+      }
+      .dashboard-container {
+        padding: 1.3em 0.2em;
+      }
     }
-    .bar-el{
-      display:block;height:100%;border-radius:7px;
-      background: linear-gradient(90deg,var(--blue),var(--emerald),var(--violet));
-      transition:width .5s;
-    }
-    .bar-el.fail{background:linear-gradient(90deg,var(--danger),var(--warning));}
-    .bar-el.success{background:linear-gradient(90deg,var(--success),var(--emerald),var(--blue));}
-    .tables-flex{display:grid;grid-template-columns:2fr 2fr 1.5fr;gap:2.2em;margin-bottom:32px;}
-    .card-table {
-      background:var(--card);padding:2em 1em 1em 1.1em;border-radius:var(--card-radius);
-      box-shadow:0 2px 18px 0 #1176d611;overflow:auto;
-      min-width:0;
-    }
-    .card-table h3 {color: var(--blue-dark);font-weight:600;margin:-3px 0 9px 0;font-size:1.1em;letter-spacing:.015em;}
-    table {width:100%;border-collapse:collapse;font-size:.98em;}
-    th, td {padding:9px 10px;}
-    th{background:var(--goal);color:#367abb;font-weight:600;}
-    tr{transition:background .13s;}
-    td.status { font-weight:600; }
-    td.status.unassigned, .tag.yel { color:var(--warning); }
-    td.status.late, .tag.red { color:var(--danger);}
-    td.status.ok, .tag.green {color:var(--success);}
-    .tag{font-size:.98em;padding:3px 11px;border-radius:6px;display:inline-block;}
-    .tag.green{background:rgba(35,200,150,0.10);}
-    .tag.red{background:rgba(240,65,65,0.13);}
-    .tag.yel{background:rgba(255,180,40,0.11);}
-    .rank-icon{font-size:1.2em;}
-    .cg-title{font-size:1.1em;font-weight:700;margin-bottom:8px;letter-spacing:.03em;}
-    @media(max-width:1100px){.tables-flex{grid-template-columns:1fr;gap:1.6em;}}
-    @media(max-width:800px){.kpis{grid-template-columns:1fr 1fr;}}
-    @media(max-width:520px){header{flex-direction:column;gap:.6em}.logo{height:30px;} .kpis{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Synergy_HomeCare_logo.svg" class="logo" alt="Synergy HomeCare Logo">
-    <div>
-      <div style="font-weight:700;letter-spacing:.07em;font-size:1.07em;">Synergy HomeCare</div>
-      <div style="font-size:.98em;opacity:.86;letter-spacing:.02em;">Scheduler Dashboard &ndash; South Austin</div>
-    </div>
-  </header>
-  <div class="main-section">
-    <div class="kpis" id="kpis">
-      <!-- KPI Cards will be filled by JS -->
-    </div>
-    <div class="tables-flex">
-      <div class="card-table">
-        <h3>Unassigned Visits</h3>
-        <table id="table-unassigned"><tr><th>Date</th><th>Client</th><th>Service</th><th>Status</th></tr></table>
-      </div>
-      <div class="card-table">
-        <h3>Late / Missed Visits</h3>
-        <table id="table-late"><tr><th>Date</th><th>Client</th><th>Caregiver</th><th>Status</th></tr></table>
-      </div>
-      <div class="card-table">
-        <h3>Most Active Caregivers</h3>
-        <div class="cg-title">Top 5</div>
-        <table id="leaderboard"><tr><th>#</th><th>Caregiver</th><th>Visits</th></tr></table>
-      </div>
-    </div>
+  <div class="dashboard-container">
+    <div class="dashboard-title">Scheduler KPI Dashboard<br><span style="font-size:0.73em; font-weight: 500; color:#222;">Synergy South Austin – October 2025</span></div>
+    <div class="kpi-row" id="kpi-row"></div>
   </div>
+
   <script>
-    // Modern color palette, easy night mode switchable by adding a toggle if you want.
-
-    // KPI GOALS: updated for your use case/goals
-    const kpiGoals = {
-      unassigned: 2,
-      late: 6,
-      visits: 500,
-      top: 30
-    };
-
-    // DEMO Realistic Data: Replace arrays with auto-generated from your CSV
-    const scheduledVisits = [
-      {date:"10/12/25",client:"Smith, John",service:"Personal Care",status:"Unassigned"},
-      {date:"10/12/25",client:"Lee, Anna",service:"sv15",status:"Unassigned"},
-      {date:"10/13/25",client:"Bryson, Cynthia",service:"Personal Care",status:"Unassigned"}
-    ];
-    const lateMissed = [
-      {date:"10/13/25",client:"Smith, James (BH)",caregiver:"Beckwith, Ruth",status:"Missed Clock Out"},
-      {date:"10/26/25",client:"Bryson, Cynthia",caregiver:"Kaur, Ravinder",status:"Missed Clock In"},
-      {date:"10/28/25",client:"Nino, Amy",caregiver:"Rodriguez De Aviles, Gaudencia (Gabby)",status:"Late Arrival"}
-    ];
-    const caregiverStats = [
-      {name:"Alvarez, Maria T",count:31},
-      {name:"Flores, Griselda Lilia Martinez",count:29},
-      {name:"Kimbrough, Rhonda",count:24},
-      {name:"Rodriguez De Aviles, Gaudencia (Gabby)",count:20},
-      {name:"Carrizales, Marissa Y",count:17}
+    // Update these values as needed
+    const kpis = [
+      { label: "Total Scheduled Visits", value: 515 },
+      { label: "Total Verified Visits", value: 514 },
+      { label: "Total Scheduled Hours", value: "1,426.47" },
+      { label: "Total Billable Hours", value: "1,553.10" },
+      { label: "Total Payable Hours", value: "1,478.65" },
     ];
 
-    // Main KPIs: calculate
-    const unassignedResult = scheduledVisits.length;
-    const missedResult = lateMissed.length;
-    const totalVisits = 515; // Fill with .length of all scheduled visits if needed
-    const topCaregiverVisits = caregiverStats[0] ? caregiverStats[0].count : 0;
-
-    // Card Info Array
-    const kpisArr = [
-      {
-        icon:"⚠️",
-        id:"unassigned",
-        label:"Unassigned Visits",
-        val:unassignedResult,
-        goal:kpiGoals.unassigned,
-        barType:'lower'
-      },
-      {
-        icon:"⏰",
-        id:"late",
-        label:"Late/Missed Visits",
-        val:missedResult,
-        goal:kpiGoals.late,
-        barType:'lower'
-      },
-      {
-        icon:"📅",
-        id:"visits",
-        label:"Total Visits",
-        val:totalVisits,
-        goal:kpiGoals.visits,
-        barType:'higher'
-      },
-      {
-        icon:"🏆",
-        id:"top",
-        label:"Most Active Caregiver",
-        val:topCaregiverVisits,
-        goal:kpiGoals.top,
-        barType:'higher'
-      }
-    ];
-    // Render KPIs
-    function renderKPIs() {
-      const kpiWrap = document.getElementById('kpis');
-      kpiWrap.innerHTML = kpisArr.map(kpi => {
-        const isGood = kpi.barType === 'higher'
-             ? kpi.val >= kpi.goal
-             : kpi.val <= kpi.goal;
-        let percent = kpi.goal ? Math.min(kpi.val / kpi.goal * 100, 100) : 100;
-        let barCls = isGood ? "bar-el success" : "bar-el fail";
-        let barWidth = kpi.goal ? Math.min((kpi.barType==='higher'?kpi.val/kpi.goal:kpi.goal/kpi.val)*100, 100) : 100;
-        barWidth = barWidth > 100 ? 100 : barWidth;
-        return `
-          <div class="kpi">
-            <span class="kpi-icon">${kpi.icon}</span>
-            <div class="kpi-value">${kpi.val}<span class="kpi-goal">/ ${kpi.goal}</span></div>
-            <div class="kpi-title">${kpi.label}</div>
-            <div class="bar-wrap"><span class="${barCls}" style="width: ${barWidth}%;"></span></div>
-          </div>
-        `;
-      }).join('');
-    }
-    renderKPIs();
-
-    // Tables
-    function fillTable(arr, tableId, cols) {
-      const table = document.getElementById(tableId);
-      table.innerHTML = '<tr>' + cols.map(c=>`<th>${c.head}</th>`).join('') + '</tr>' +
-        arr.map((row,i) => 
-          `<tr>` + cols.map(c =>
-            `<td${c.key==='status' ? ' class="status '+(row.status||'').toLowerCase()+'"' : ''}>${row[c.key]}</td>`
-          ).join('') + `</tr>`
-        ).join('');
-    }
-    fillTable(scheduledVisits, 'table-unassigned', [
-      {head:"Date",key:"date"},
-      {head:"Client",key:"client"},
-      {head:"Service",key:"service"},
-      {head:"Status",key:"status"}
-    ]);
-    fillTable(lateMissed, 'table-late', [
-      {head:"Date",key:"date"},
-      {head:"Client",key:"client"},
-      {head:"Caregiver",key:"caregiver"},
-      {head:"Status",key:"status"}
-    ]);
-
-    // Top caregiver leaderboard
-    function fillLeaderboard(arr) {
-      document.getElementById('leaderboard').innerHTML =
-        arr.map((c, i) => 
-          `<tr>
-            <td><span class="rank-icon">${["🥇","🥈","🥉","4","5"][i]||i+1}</span></td>
-            <td>${c.name}</td>
-            <td><span class="tag green">${c.count}</span></td>
-          </tr>`).join('');
-    }
-    fillLeaderboard(caregiverStats);
+    const kpiRow = document.getElementById('kpi-row');
+    kpis.forEach(kpi => {
+      const tile = document.createElement('div');
+      tile.className = 'kpi-tile';
+      tile.innerHTML = \`
+        <div class="kpi-value">\${kpi.value}</div>
+        <div class="kpi-label">\${kpi.label}</div>
+      \`;
+      kpiRow.appendChild(tile);
+    });
   </script>
 </body>
 </html>
