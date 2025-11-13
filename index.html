@@ -1,170 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Scheduler Dashboard | Synergy HomeCare South Austin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --background: #f8fafc;
-      --card: #ffffffee;
-      --primary: #234f7c;
-      --gradient: linear-gradient(135deg,#4F86C6 0%, #34A6A2 100%);
-      --danger: #e35d65;
-      --warning: #FFB140;
-      --success: #32dba2;
-      --accent: #be589b;
-      --shadow: 0 4px 24px rgba(36, 79, 124, 0.04);
-      --radius: 18px;
-      --trans: .18s all;
-    }
-    body {
-      margin:0; background:var(--background); font-family:'Inter', 'Montserrat', 'Roboto', sans-serif; color:#25282b;
-    }
-    header {display:flex;align-items:center;gap:1rem;padding:1.3rem 2rem;background:var(--primary);color:#fff;}
-    .logo {height:38px;}
-    h1 {letter-spacing:0.03em;font-size:1.7em;}
-    .dashboard {max-width:1300px;margin:32px auto;padding:0 20px;}
-    .cards {display:grid;grid-template-columns:repeat(3,1fr);gap:2.2rem;margin-bottom:2.5rem;}
-    .card {
-      background:var(--card);padding:2.1em 1em 1.7em 1em;border-radius:var(--radius);box-shadow:var(--shadow);
-      display:flex;flex-direction:column;align-items:center;justify-content:center; transition:var(--trans);
-      border: 2px solid transparent;
-    }
-    .card.up {border-color:var(--accent);}
-    .card.late {border-color:var(--danger);}
-    .card.unassigned {border-color:var(--warning);}
-    .card h2 {margin:0 0 6px 0;font-size:2.3em;}
-    .card span {font-size:1.15em;letter-spacing:.03em;}
-    .card .icon {margin-bottom:7px;font-size:2.1em;}
-    .section {margin-bottom:2.7rem;}
-    .section h3 {margin-bottom:1.2rem;font-size:1.3em;color:var(--primary);}
-    table {border-radius:var(--radius);box-shadow:var(--shadow);background:var(--card);width:100%;border-collapse:collapse;}
-    th,td {padding:12px;text-align:left;border-bottom:1px solid #f1f1f1;}
-    th {background:var(--gradient);color:#fff;}
-    td.status {font-weight:bold;}
-    td.status.unassigned {color:var(--warning);}
-    td.status.late {color:var(--danger);}
-    td.status.complete {color:var(--success);}
-    tr:last-child td {border-bottom:none;}
-    .leaderboard {margin-top:8px;display:grid;grid-template-columns: 1fr;}
-    .leaderboard-entry {
-      display:flex;align-items:center;gap:1em;background:#f3f7fc;padding:1em;border-radius:10px;margin-bottom:8px;
-    }
-    .leaderboard-entry .rank {
-      font-size:1.3em;width:32px;text-align:center;font-weight:700;background:var(--gradient);color:#fff;border-radius:50%;
-      height:32px;display:flex;align-items:center;justify-content:center;
-    }
-    .leaderboard-entry .name {font-weight:600;}
-    .leaderboard-entry .count {color:var(--primary);font-weight:700;}
-    @media(max-width:900px){.cards{grid-template-columns:1fr;}}
-    @media(max-width:700px){.dashboard{padding:0 8px;}}
-    @media(max-width:500px){header{flex-direction:column;gap:.7em}.logo{height:28px;}}
-  </style>
-</head>
-<body>
-  <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Synergy_HomeCare_logo.svg" class="logo" alt="Synergy HomeCare Logo">
-    <h1>Scheduler Dashboard | South Austin</h1>
-  </header>
-  <div class="dashboard">
-    <div class="cards">
-      <div class="card unassigned">
-        <span class="icon">⚠️</span>
-        <h2 id="unassigned-count">0</h2>
-        <span>Unassigned Visits</span>
-      </div>
-      <div class="card late">
-        <span class="icon">⏰</span>
-        <h2 id="late-count">0</h2>
-        <span>Late/Missed Visits</span>
-      </div>
-      <div class="card up">
-        <span class="icon">🏆</span>
-        <h2 id="top-caregiver">-</h2>
-        <span>Most Active Caregiver</span>
-      </div>
-    </div>
-    <div class="section">
-      <h3>Unassigned Visits</h3>
-      <table id="table-unassigned">
-        <tr><th>Date</th><th>Client</th><th>Service</th><th>Status</th></tr>
-      </table>
-    </div>
-    <div class="section">
-      <h3>Late / Missed Visits</h3>
-      <table id="table-late">
-        <tr><th>Date</th><th>Client</th><th>Caregiver</th><th>Status</th></tr>
-      </table>
-    </div>
-    <div class="section">
-      <h3>Most Active Caregivers</h3>
-      <div class="leaderboard" id="leaderboard"></div>
-    </div>
+<div class="cards">
+  <div class="card unassigned">
+    <span class="icon">⚠️</span>
+    <h2 id="unassigned-count">0 <span class="goal">/ 2</span></h2>
+    <span>Unassigned Visits</span>
+    <div id="unassigned-bar" class="bar"></div>
   </div>
-  <script>
-    // DEMO DATA: Use real data from your export (you can update these arrays with full lists)
-    const scheduledVisits = [
-      // Unassigned Visits (sample)
-      {date:"10/12/25",client:"Smith, John",service:"Personal Care",status:"Unassigned"},
-      {date:"10/12/25",client:"Lee, Anna",service:"sv15",status:"Unassigned"},
-      {date:"10/13/25",client:"Bryson, Cynthia",service:"Personal Care",status:"Unassigned"},
-      // Completed or assigned visits (for demo only)
-    ];
-    const lateMissed = [
-      // Late/Missed Visits (sample)
-      {date:"10/13/25",client:"Smith, James (BH)",caregiver:"Beckwith, Ruth",status:"Missed Clock Out"},
-      {date:"10/26/25",client:"Bryson, Cynthia",caregiver:"Kaur, Ravinder",status:"Missed Clock In"},
-      {date:"10/28/25",client:"Nino, Amy",caregiver:"Rodriguez De Aviles, Gaudencia (Gabby)",status:"Late Arrival"},
-      // Add more from your actual CSV "Missed Clock Event"
-    ];
-    const caregiverStats = [
-      {name:"Alvarez, Maria T",count:31},
-      {name:"Flores, Griselda Lilia Martinez",count:29},
-      {name:"Kimbrough, Rhonda",count:24},
-      {name:"Rodriguez De Aviles, Gaudencia (Gabby)",count:20},
-      {name:"Carrizales, Marissa Y",count:17}
-      // Fill with most active (from your CSV counts)
-    ];
-
-    // UI Data Logic
-    document.getElementById('unassigned-count').textContent = scheduledVisits.length;
-    document.getElementById('late-count').textContent = lateMissed.length;
-    document.getElementById('top-caregiver').textContent = caregiverStats[0] ? caregiverStats[0].name : '--';
-
-    function fillTable(arr, tableId, cols, statusClass) {
-      const table = document.getElementById(tableId);
-      table.innerHTML = '<tr>'
-        + cols.map(c=>`<th>${c.head}</th>`).join('')
-        + '</tr>' +
-        arr.map(row => `<tr>`
-          + cols.map(c=>`<td${c.key==='status'&&statusClass ? ' class="status '+(row.status||'').toLowerCase()+'"' : ''}>${row[c.key]}</td>`).join('')
-          + `</tr>`
-        ).join('');
-    }
-    fillTable(scheduledVisits, 'table-unassigned', [
-      {head:"Date",key:"date"},
-      {head:"Client",key:"client"},
-      {head:"Service",key:"service"},
-      {head:"Status",key:"status"}
-    ], true);
-    fillTable(lateMissed, 'table-late', [
-      {head:"Date",key:"date"},
-      {head:"Client",key:"client"},
-      {head:"Caregiver",key:"caregiver"},
-      {head:"Status",key:"status"}
-    ], true);
-
-    // Leaderboard display
-    document.getElementById('leaderboard').innerHTML = caregiverStats.map((c,i)=>`
-      <div class="leaderboard-entry">
-        <span class="rank">${i+1}</span>
-        <span class="name">${c.name}</span>
-        <span class="count">${c.count} visits</span>
-      </div>
-    `).join('');
-
-    // TO INTEGRATE FULL DATA: Replace demo arrays above with parsed arrays from your CSVs for each table. Auto-calculate stats for most active caregivers from full schedules.
-  </script>
-</body>
-</html>
+  <div class="card late">
+    <span class="icon">⏰</span>
+    <h2 id="late-count">0 <span class="goal">/ 6</span></h2>
+    <span>Late/Missed Visits</span>
+    <div id="missed-bar" class="bar"></div>
+  </div>
+  <div class="card up">
+    <span class="icon">📅</span>
+    <h2 id="total-visits">0 <span class="goal">/ 500</span></h2>
+    <span>Total Scheduled</span>
+    <div id="visits-bar" class="bar"></div>
+  </div>
+  <div class="card up">
+    <span class="icon">🏆</span>
+    <h2 id="top-caregiver">- <span class="goal">/ 30</span></h2>
+    <span>Most Active Caregiver</span>
+    <div id="top-bar" class="bar"></div>
+  </div>
+</div>
