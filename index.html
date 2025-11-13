@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Synergy HomeCare South Austin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --primary: #911F36;
+            --accent: #CB5D78;
+            --bg: #F5F5F5;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --shadow: 0 4px 16px rgba(145,31,54,0.15);
+        }
+        body { font-family: 'Montserrat', 'Roboto', sans-serif; background: var(--bg); margin: 0;}
+        header { display: flex; align-items: center; padding: 1rem 2rem; background: var(--primary); color: #fff;}
+        .logo { height: 40px; margin-right: 1rem;}
+        h1 { flex: 1; font-size: 2em; }
+        .team-name { font-weight: 600; letter-spacing: .05em; }
+        aside { background: var(--primary); color: #fff; width: 200px; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 10;}
+        nav ul { list-style: none; padding: 2rem 0 0 2rem;}
+        nav li { margin-bottom: 1.2rem; font-weight: bold; cursor: pointer;}
+        main { margin-left: 220px; padding: 2rem 2rem 2rem 2rem;}
+        .cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem;}
+        .card { background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow); text-align: center; padding: 2rem 1rem;}
+        .card h2 { color: var(--primary); margin: 0;}
+        .card span { color: var(--accent);}
+        .table-section { margin: 2.5rem 0; }
+        table { border-collapse: collapse; width: 100%; background: var(--card-bg); box-shadow: var(--shadow); border-radius: 10px; overflow: hidden;}
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee;}
+        tr:last-child td { border-bottom: none;}
+        th { background: var(--accent); color: #fff;}
+        footer { background: var(--primary); color: #fff; text-align: center; padding: 1rem; margin-top: 3rem;}
+        @media (max-width: 1000px) {.cards {grid-template-columns:repeat(2,1fr);} main{padding:1rem;}}
+        @media (max-width: 700px) {
+            aside {position: static;width:100%;min-height:0;}
+            main {margin:0;}
+            .cards {grid-template-columns:1fr;}
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Synergy_HomeCare_logo.svg" alt="Synergy HomeCare Logo" class="logo">
+        <h1>Scheduling Team Dashboard</h1>
+        <span class="team-name">South Austin</span>
+    </header>
+    <aside>
+        <nav>
+            <ul>
+                <li>Dashboard</li>
+                <li>Schedules</li>
+                <li>Caregivers</li>
+                <li>Reports</li>
+                <li>Settings</li>
+            </ul>
+        </nav>
+    </aside>
+    <main>
+        <section class="cards" id="summaryCards">
+            <!-- Cards will be injected here -->
+        </section>
+        <section class="table-section">
+            <h2>Visits by Caregiver</h2>
+            <table id="caregiver-table"></table>
+        </section>
+        <section class="table-section">
+            <h2>Hours by Service Rate</h2>
+            <table id="service-rate-table"></table>
+        </section>
+    </main>
+    <footer>
+        <p>Synergy HomeCare South Austin &copy; 2025</p>
+        <p>Contact: 512-XXX-XXXX</p>
+    </footer>
+    <script>
+        // Demo data, replace this with imported JSON from your real reports
+        const summary = [
+            { label: "Total Visits", value: "515" },
+            { label: "Total Clients", value: "37" },
+            { label: "Total Caregivers", value: "21" },
+            { label: "Billable Hours", value: "1,553.10h" }
+        ];
+        const caregiverData = [
+            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Vivian Brown", visits: 2, billable: 3.25, payable: 2.6 },
+            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Cynthia Bryson", visits: 2, billable: 2.0, payable: 0.53 },
+            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Seanna Desmond", visits: 7, billable: 19.33, payable: 19.6 },
+            { name: "Maria T Alvarez", phone: "512-688-9435", client: "Minerva Wesar", visits: 15, billable: 138.58, payable: 138.58 },
+        ];
+        const serviceRateData = [
+            { service: "Hourly 42.00 Personal Care", scheduledVisits: 306, scheduledHours: 1175.58, verifiedVisits: 306, verifiedHours: 1175.58 },
+            { service: "Fixed 21.00 sv15", scheduledVisits: 169, scheduledHours: 169, verifiedVisits: 169, verifiedHours: 169 },
+            { service: "Hourly 40.00 Transportation", scheduledVisits: 7, scheduledHours: 18.9, verifiedVisits: 7, verifiedHours: 18.9 },
+        ];
+
+        // Render Summary Cards
+        const cardSection = document.getElementById('summaryCards');
+        summary.forEach(card => {
+            cardSection.innerHTML += `
+                <div class="card">
+                    <h2>${card.value}</h2>
+                    <span>${card.label}</span>
+                </div>
+            `;
+        });
+
+        // Render Caregiver Table
+        function renderTable(data, tableId) {
+            const table = document.getElementById(tableId);
+            table.innerHTML = `<tr>
+                    <th>Caregiver</th>
+                    <th>Phone</th>
+                    <th>Client</th>
+                    <th>Visits</th>
+                    <th>Billable Hours</th>
+                    <th>Payable Hours</th>
+                </tr>` +
+                data.map(d =>
+                    `<tr>
+                        <td>${d.name}</td>
+                        <td>${d.phone}</td>
+                        <td>${d.client}</td>
+                        <td>${d.visits}</td>
+                        <td>${d.billable}</td>
+                        <td>${d.payable}</td>
+                    </tr>`
+                ).join('');
+        }
+        renderTable(caregiverData, 'caregiver-table');
+
+        // Render Service Rate Table
+        function renderServiceRate(data, tableId) {
+            const table = document.getElementById(tableId);
+            table.innerHTML = `<tr>
+                    <th>Service</th>
+                    <th>Scheduled Visits</th>
+                    <th>Scheduled Billable Hours</th>
+                    <th>Verified Visits</th>
+                    <th>Verified Billable Hours</th>
+                </tr>` +
+                data.map(d =>
+                    `<tr>
+                        <td>${d.service}</td>
+                        <td>${d.scheduledVisits}</td>
+                        <td>${d.scheduledHours}</td>
+                        <td>${d.verifiedVisits}</td>
+                        <td>${d.verifiedHours}</td>
+                    </tr>`
+                ).join('');
+        }
+        renderServiceRate(serviceRateData, 'service-rate-table');
+    </script>
+</body>
+</html>
